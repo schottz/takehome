@@ -7,4 +7,8 @@ kubectl create deployment go-app -n takehome --image=schottz/go_image --dry-run=
 
 kubectl -n takehome expose deployment/go-app --name=go-service --port 8080 --dry-run=client -o yaml > service.yaml
 
-## Tested with minikube service go-service -n takehome 
+kuebctl apply -f ./
+
+# Testing
+
+minikube service go-service -n takehome 
