@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: takehome
+  labels:
+    app: go-app
+  name: go-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: go-app
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: go-app
+    spec:
+      containers:
+      - image: mygoapp:1714770431
+        name: go-image-fhtzn
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 3
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sh", "-c", "echo 'Shutting down gracefully...'"]
+      initContainers:
+      - name: my-init-container
+        image: busybox:1.28
+        command: ['sh', '-c', "sleep 30"]
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: go-app
+  name: go-service
+  namespace: takehome
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: go-app
+status:
+  loadBalancer: {}
